@@ -1,0 +1,13 @@
+FROM openjdk:8-jdk-alpine
+RUN apk update && apk add java-snappy
+RUN apk update && apk add --no-cache libc6-compat
+RUN ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
+
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} Huddler.jar
+
+COPY target/*.avro items_snappy.avro
+COPY target/*.avsc item_schema.avsc
+
+ENV JAVA_OPTS='-Xmx25g -Xms3g'
+ENTRYPOINT exec java $JAVA_OPTS -jar Huddler.jar
